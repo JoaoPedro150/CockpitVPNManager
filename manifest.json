@@ -1,0 +1,10 @@
+{
+    "version": 0,
+
+    "tools": {
+        "vpn": {
+            "label": "OpenVPN Manager",
+            "path": "vpnmanager.html"
+        }
+    }
+}
