@@ -10,16 +10,30 @@
    <div class="pf-c-page">
         <main class="pf-c-page__main" tabindex="-1">
             <section class="pf-c-page__main-section pf-m-light">
-                <div id="next-step">
-                    <p id="nextStepMessage"></p>
-
-                    <button id="btnNextStep"></button>
+                <div id="div-dashboard">
+                    <span>Status: </span><span id="span-service-status"></span>
+                    <button id="btn-toggle-service-state"></button>
+                    <button id="btn-restart-service">Restart</button>
+                    <hr/>
+                    <span>Protocol: </span><input id="input-vpn-proto"></input>
+                    <button id="btn-change-vpn-proto">Save</button>
+                    <br/>
+                    <span>Port: </span><input id="input-vpn-port"></input>
+                    <button id="btn-change-vpn-port">Save</button>
+                    <br/>
+                    <span>DNS: </span><input id="input-vpn-dns"></input>
+                    <button id="btn-change-vpn-dns">Save</button>
                 </div>
-                <div id="executing-step">
-                    <p id="infoMessage"></p>
+                <hr/>
+                <div id="div-vpn-not-installed">
+                    <span id="span-vpn-not-installed-information">It looks like you don't have OpenVPN installed yet.</span>
 
-                    <pre id="output"></pre>
-                    <pre id="errorOutput"></pre>
+                    <button id="btn-install-vpn">Install OpenVPN</button>
+                </div>
+                <div id="div-setuping-vpn">
+                    <p>Installing and configuring OpenVPN...</p>
+
+                    <pre id="setuping-vpn-output"></pre>
                 </div>
             </section>
         </main>
