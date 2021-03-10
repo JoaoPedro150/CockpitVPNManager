@@ -27,12 +27,13 @@ button {
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
-    margin-top: 120px;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
+    width:100vw; margin:0 auto!important;
+    display: flex!important;
+    flex-direction: column!important;
+    margin-top: 120px!important;
+    justify-content: center!important;
+    align-items: center!important;
+    align-content: center!important;
 }
 
 .installing_container {
@@ -48,7 +49,9 @@ button {
     background-color: #3D3D3D;
     color: #fff;
     height: auto;
-    max-height: 220px;
+    min-height: 190px;
+    max-height: 190px;
+    width: 450px;
     overflow: auto;
     word-break: normal !important;
     word-wrap: normal !important;
