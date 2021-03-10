@@ -27,7 +27,12 @@ function checkOS() {
 				echo ""
 				echo "However, if you're using Debian >= 9 or unstable/testing then you can continue, at your own risk."
 				echo ""
-                exit 1
+				until [[ $CONTINUE =~ (y|n) ]]; do
+					read -rp "Continue? [y/n]: " -e CONTINUE
+				done
+				if [[ $CONTINUE == "n" ]]; then
+					exit 1
+				fi
 			fi
 		elif [[ $ID == "ubuntu" ]]; then
 			OS="ubuntu"
@@ -35,7 +40,14 @@ function checkOS() {
 			if [[ $MAJOR_UBUNTU_VERSION -lt 16 ]]; then
 				echo "⚠️ Your version of Ubuntu is not supported."
 				echo ""
-				exit 1
+				echo "However, if you're using Ubuntu >= 16.04 or beta, then you can continue, at your own risk."
+				echo ""
+				until [[ $CONTINUE =~ (y|n) ]]; do
+					read -rp "Continue? [y/n]: " -e CONTINUE
+				done
+				if [[ $CONTINUE == "n" ]]; then
+					exit 1
+				fi
 			fi
 		fi
 	elif [[ -e /etc/system-release ]]; then
@@ -196,6 +208,16 @@ access-control: fd42:42:42:42::/112 allow' >>/etc/unbound/openvpn.conf
 }
 
 function installQuestions() {
+	echo "Welcome to the OpenVPN installer!"
+	echo "The git repository is available at: https://github.com/angristan/openvpn-install"
+	echo ""
+
+	echo "I need to ask you a few questions before starting the setup."
+	echo "You can leave the default options and just press enter if you are ok with them."
+	echo ""
+	echo "I need to know the IPv4 address of the network interface you want OpenVPN listening to."
+	echo "Unless your server is behind NAT, it should be your public IPv4 address."
+
 	# Detect public IPv4 address and pre-fill for the user
 	IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | head -1)
 
@@ -209,6 +231,10 @@ function installQuestions() {
 	fi
 	# If $IP is a private IP address, the server must be behind NAT
 	if echo "$IP" | grep -qE '^(10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|192\.168)'; then
+		echo ""
+		echo "It seems this server is behind NAT. What is its public IPv4 address or hostname?"
+		echo "We need it for the clients to connect to the server."
+
 		PUBLICIP=$(curl -s https://api.ipify.org)
 		until [[ $ENDPOINT != "" ]]; do
 			read -rp "Public IPv4 address or hostname: " -e -i "$PUBLICIP" ENDPOINT
@@ -236,6 +262,11 @@ function installQuestions() {
 	until [[ $IPV6_SUPPORT =~ (y|n) ]]; do
 		read -rp "Do you want to enable IPv6 support (NAT)? [y/n]: " -e -i $SUGGESTION IPV6_SUPPORT
 	done
+	echo ""
+	echo "What port do you want OpenVPN to listen to?"
+	echo "   1) Default: 1194"
+	echo "   2) Custom"
+	echo "   3) Random [49152-65535]"
 	until [[ $PORT_CHOICE =~ ^[1-3]$ ]]; do
 		read -rp "Port choice [1-3]: " -e -i 1 PORT_CHOICE
 	done
@@ -254,6 +285,11 @@ function installQuestions() {
 		echo "Random Port: $PORT"
 		;;
 	esac
+	echo ""
+	echo "What protocol do you want OpenVPN to use?"
+	echo "UDP is faster. Unless it is not available, you shouldn't use TCP."
+	echo "   1) UDP"
+	echo "   2) TCP"
 	until [[ $PROTOCOL_CHOICE =~ ^[1-2]$ ]]; do
 		read -rp "Protocol [1-2]: " -e -i 1 PROTOCOL_CHOICE
 	done
@@ -265,6 +301,53 @@ function installQuestions() {
 		PROTOCOL="tcp"
 		;;
 	esac
+	echo ""
+	echo "What DNS resolvers do you want to use with the VPN?"
+	echo "   1) Current system resolvers (from /etc/resolv.conf)"
+	echo "   2) Self-hosted DNS Resolver (Unbound)"
+	echo "   3) Cloudflare (Anycast: worldwide)"
+	echo "   4) Quad9 (Anycast: worldwide)"
+	echo "   5) Quad9 uncensored (Anycast: worldwide)"
+	echo "   6) FDN (France)"
+	echo "   7) DNS.WATCH (Germany)"
+	echo "   8) OpenDNS (Anycast: worldwide)"
+	echo "   9) Google (Anycast: worldwide)"
+	echo "   10) Yandex Basic (Russia)"
+	echo "   11) AdGuard DNS (Anycast: worldwide)"
+	echo "   12) NextDNS (Anycast: worldwide)"
+	echo "   13) Custom"
+	until [[ $DNS =~ ^[0-9]+$ ]] && [ "$DNS" -ge 1 ] && [ "$DNS" -le 13 ]; do
+		read -rp "DNS [1-12]: " -e -i 11 DNS
+		if [[ $DNS == 2 ]] && [[ -e /etc/unbound/unbound.conf ]]; then
+			echo ""
+			echo "Unbound is already installed."
+			echo "You can allow the script to configure it in order to use it from your OpenVPN clients"
+			echo "We will simply add a second server to /etc/unbound/unbound.conf for the OpenVPN subnet."
+			echo "No changes are made to the current configuration."
+			echo ""
+
+			until [[ $CONTINUE =~ (y|n) ]]; do
+				read -rp "Apply configuration changes to Unbound? [y/n]: " -e CONTINUE
+			done
+			if [[ $CONTINUE == "n" ]]; then
+				# Break the loop and cleanup
+				unset DNS
+				unset CONTINUE
+			fi
+		elif [[ $DNS == "13" ]]; then
+			until [[ $DNS1 =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; do
+				read -rp "Primary DNS: " -e DNS1
+			done
+			until [[ $DNS2 =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; do
+				read -rp "Secondary DNS (optional): " -e DNS2
+				if [[ $DNS2 == "" ]]; then
+					break
+				fi
+			done
+		fi
+	done
+	echo ""
+	echo "Do you want to use compression? It is not recommended since the VORACLE attack make use of it."
 	until [[ $COMPRESSION_ENABLED =~ (y|n) ]]; do
 		read -rp"Enable compression? [y/n]: " -e -i n COMPRESSION_ENABLED
 	done
@@ -288,6 +371,12 @@ function installQuestions() {
 			;;
 		esac
 	fi
+	echo ""
+	echo "Do you want to customize encryption settings?"
+	echo "Unless you know what you're doing, you should stick with the default parameters provided by the script."
+	echo "Note that whatever you choose, all the choices presented in the script are safe. (Unlike OpenVPN's defaults)"
+	echo "See https://github.com/angristan/openvpn-install#security-and-encryption to learn more."
+	echo ""
 	until [[ $CUSTOMIZE_ENC =~ (y|n) ]]; do
 		read -rp "Customize encryption settings? [y/n]: " -e -i n CUSTOMIZE_ENC
 	done
@@ -503,11 +592,19 @@ function installQuestions() {
 			read -rp "Control channel additional security mechanism [1-2]: " -e -i 1 TLS_SIG
 		done
 	fi
+	echo ""
+	echo "Okay, that was all I needed. We are ready to setup your OpenVPN server now."
+	echo "You will be able to generate a client at the end of the installation."
+	APPROVE_INSTALL=${APPROVE_INSTALL:-n}
+	if [[ $APPROVE_INSTALL =~ n ]]; then
+		read -n1 -r -p "Press any key to continue..."
+	fi
 }
 
 function installOpenVPN() {
 	if [[ $AUTO_INSTALL == "y" ]]; then
 		# Set default choices so that no questions will be asked.
+		APPROVE_INSTALL=${APPROVE_INSTALL:-y}
 		APPROVE_IP=${APPROVE_IP:-y}
 		IPV6_SUPPORT=${IPV6_SUPPORT:-n}
 		PORT_CHOICE=${PORT_CHOICE:-1}
@@ -946,12 +1043,23 @@ verb 3" >>/etc/openvpn/client-template.txt
 
 	# Generate the custom client.ovpn
 	newClient
+	echo "If you want to add more clients, you simply need to run this script another time!"
 }
 
 function newClient() {
+	echo ""
+	echo "Tell me a name for the client."
+	echo "The name must consist of alphanumeric character. It may also include an underscore or a dash."
+
 	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]+$ ]]; do
 		read -rp "Client name: " -e CLIENT
 	done
+
+	echo ""
+	echo "Do you want to protect the configuration file with a password?"
+	echo "(e.g. encrypt the private key with a password)"
+	echo "   1) Add a passwordless client"
+	echo "   2) Use a password for the client"
 
 	until [[ $PASS =~ ^[1-2]$ ]]; do
 		read -rp "Select an option [1-2]: " -e -i 1 PASS
@@ -960,8 +1068,8 @@ function newClient() {
 	CLIENTEXISTS=$(tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep -c -E "/CN=$CLIENT\$")
 	if [[ $CLIENTEXISTS == '1' ]]; then
 		echo ""
-		echo "The specified client CN was already found in easy-rsa."
-		exit 1
+		echo "The specified client CN was already found in easy-rsa, please choose another name."
+		exit
 	else
 		cd /etc/openvpn/easy-rsa/ || return
 		case $PASS in
@@ -1027,6 +1135,75 @@ function newClient() {
 	echo "Download the .ovpn file and import it in your OpenVPN client."
 
 	exit 0
+}
+
+function revokeClient() {
+	NUMBEROFCLIENTS=$(tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep -c "^V")
+	if [[ $NUMBEROFCLIENTS == '0' ]]; then
+		echo ""
+		echo "You have no existing clients!"
+		exit 1
+	fi
+
+	echo ""
+	echo "Select the existing client certificate you want to revoke"
+	tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
+	until [[ $CLIENTNUMBER -ge 1 && $CLIENTNUMBER -le $NUMBEROFCLIENTS ]]; do
+		if [[ $CLIENTNUMBER == '1' ]]; then
+			read -rp "Select one client [1]: " CLIENTNUMBER
+		else
+			read -rp "Select one client [1-$NUMBEROFCLIENTS]: " CLIENTNUMBER
+		fi
+	done
+	CLIENT=$(tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$CLIENTNUMBER"p)
+	cd /etc/openvpn/easy-rsa/ || return
+	./easyrsa --batch revoke "$CLIENT"
+	EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
+	rm -f /etc/openvpn/crl.pem
+	cp /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn/crl.pem
+	chmod 644 /etc/openvpn/crl.pem
+	find /home/ -maxdepth 2 -name "$CLIENT.ovpn" -delete
+	rm -f "/root/$CLIENT.ovpn"
+	sed -i "/^$CLIENT,.*/d" /etc/openvpn/ipp.txt
+
+	echo ""
+	echo "Certificate for client $CLIENT revoked."
+}
+
+function removeUnbound() {
+	# Remove OpenVPN-related config
+	sed -i '/include: \/etc\/unbound\/openvpn.conf/d' /etc/unbound/unbound.conf
+	rm /etc/unbound/openvpn.conf
+
+	until [[ $REMOVE_UNBOUND =~ (y|n) ]]; do
+		echo ""
+		echo "If you were already using Unbound before installing OpenVPN, I removed the configuration related to OpenVPN."
+		read -rp "Do you want to completely remove Unbound? [y/n]: " -e REMOVE_UNBOUND
+	done
+
+	if [[ $REMOVE_UNBOUND == 'y' ]]; then
+		# Stop Unbound
+		systemctl stop unbound
+
+		if [[ $OS =~ (debian|ubuntu) ]]; then
+			apt-get autoremove --purge -y unbound
+		elif [[ $OS == 'arch' ]]; then
+			pacman --noconfirm -R unbound
+		elif [[ $OS =~ (centos|amzn) ]]; then
+			yum remove -y unbound
+		elif [[ $OS == 'fedora' ]]; then
+			dnf remove -y unbound
+		fi
+
+		rm -rf /etc/unbound/
+
+		echo ""
+		echo "Unbound removed!"
+	else
+		systemctl restart unbound
+		echo ""
+		echo "Unbound wasn't removed."
+	fi
 }
 
 function removeOpenVPN() {
@@ -1105,9 +1282,43 @@ function removeOpenVPN() {
 	fi
 }
 
-AUTO_INSTALL=y
+function manageMenu() {
+	echo "Welcome to OpenVPN-install!"
+	echo "The git repository is available at: https://github.com/angristan/openvpn-install"
+	echo ""
+	echo "It looks like OpenVPN is already installed."
+	echo ""
+	echo "What do you want to do?"
+	echo "   1) Add a new user"
+	echo "   2) Revoke existing user"
+	echo "   3) Remove OpenVPN"
+	echo "   4) Exit"
+	until [[ $MENU_OPTION =~ ^[1-4]$ ]]; do
+		read -rp "Select an option [1-4]: " MENU_OPTION
+	done
+
+	case $MENU_OPTION in
+	1)
+		newClient
+		;;
+	2)
+		revokeClient
+		;;
+	3)
+		removeOpenVPN
+		;;
+	4)
+		exit 0
+		;;
+	esac
+}
 
 # Check for root, TUN, OS...
 initialCheck
 
-installOpenVPN
+# Check if OpenVPN is already installed
+if [[ -e /etc/openvpn/server.conf && $AUTO_INSTALL != "y" ]]; then
+	manageMenu
+else
+	installOpenVPN
+fi
