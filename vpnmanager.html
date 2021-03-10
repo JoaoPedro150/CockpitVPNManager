@@ -10,19 +10,105 @@
 <body> 
    <div class="pf-c-page">
         <main class="pf-c-page__main" tabindex="-1">
-            <section class="pf-c-page__main-section pf-m-light container">
-                <img src="./styles/logo01.png" alt="logo" id="logo">
-                <div id="next-step">
-                    <p id="nextStepMessage"></p>
-                    <br/>
+            <section class="pf-c-page__main-section pf-m-light">
+                <div id="div-dashboard">
+                    <div class="sidenav">
+                        <img src="./styles/logo02.png" alt="logo" id="logo2">
+                        <button type="button" onclick="settingsScreen()">Settings</button>
+                        <button type="button" onclick="clientsScreen()">Clients</a></button>
+                        <button type="button" onclick="keysScreen()">Keys</a></button>
+                    </div>
+                      
+                    <div class="main" id="settings_screen">
+                        
+                        <div class="status">
+                            <span>Status: </span><span id="span-service-status"></span>
+                            <button id="btn-toggle-service-state"></button>
+                            <button id="btn-restart-service">Restart</button>
+                        </div>
+                        <div class="inl">
+                            <div>
+                                <span>Port </span><input id="input-vpn-port"></input>
+                                <button id="btn-change-vpn-port">Save</button>
+                            </div>
+                            <div>
+                                <span>Protocol </span><input id="input-vpn-proto"></input>
+                                <button id="btn-change-vpn-proto">Save</button>
+                            </div>
+                            <div>
+                                <span>DNS </span><input id="input-vpn-dns"></input>
+                                <button id="btn-change-vpn-proto">Save</button>
+                            </div>
+                        </div>
 
-                    <button id="btnNextStep"></button>
+                        <div class="inl">
+                            <div>
+                                <span>Certificate authority </span><input id="input-vpn-port2"></input>
+                                <button id="btn-change-vpn-port2">Save</button>
+                            </div>
+                            <div>
+                                <span>Local certificate </span><input id="input-vpn-proto3"></input>
+                                <button id="btn-change-vpn-proto3">Save</button>
+                            </div>
+                        </div>
+
+                        <div class="inl">
+                            <div>
+                                <span>Local private key </span><input id="input-vpn-port4"></input>
+                                <button id="btn-change-vpn-port4">Save</button>
+                            </div>
+                            <div>
+                                <span>tls-auth </span><input id="input-vpn-proto5"></input>
+                                <button id="btn-change-vpn-proto5">Save</button>
+                            </div>
+                        </div>
+                        <br/><br/>
+                        <div class="inl">
+                            <div>
+                                <span>Maximum clients </span><input id="input-vpn-port6"></input>
+                                <button id="btn-change-vpn-port6">Save</button>
+                            </div>
+                            <div>
+                                <span>Compress algorithm </span><input id="input-vpn-proto7"></input>
+                                <button id="btn-change-vpn-proto7">Save</button>
+                            </div>
+                        </div>
+                        <div>
+                            <span>Push option </span><input id="input-vpn-port8"></input>
+                            <button id="btn-change-vpn-port8">Push</button>
+                        </div>
+                        <div>
+                            <span>Interval </span><input id="input-vpn-port9"></input>
+                            <span>Timeout </span><input id="input-vpn-proto9"></input>
+                            <button id="btn-change-vpn-port9">Keepalive</button>
+                        </div>
+                       
+
+                        
+                        
+                    </div>
+
+                    <div class="main" id="clients_screen">
+                    ...
+                    </div>
+
+                    <div class="main" id="keys_screen">
+                    ...
+                    </div>
                 </div>
-                <div id="executing-step">
-                    <p id="infoMessage"></p>
+                <hr/>
+                <div id="div-vpn-not-installed" class="container">
+                    <img src="./styles/logo01.png" alt="logo" id="logo">
+                    <br />
+                    <span align="center" id="span-vpn-not-installed-information">It looks like you don't<br />have OpenVPN installed yet.</span>
+                    <br />
+                    <button id="btn-install-vpn">Install OpenVPN</button>
+                </div>
+                <div id="div-setuping-vpn" class="installing_container">
+                    <img src="./styles/logo01.png" alt="logo" id="logo">
+                    <p>Installing and configuring OpenVPN...</p>
 
-                    <pre id="output"></pre>
-                    <pre id="errorOutput"></pre>
+                    <pre id="setuping-vpn-output"> </pre>
                 </div>
             </section>
         </main>

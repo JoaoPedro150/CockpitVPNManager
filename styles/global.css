@@ -1,24 +1,160 @@
+* {
+    font-family: monospace;
+    
+ }
+
+body {
+    background-color: #EFF3F6;
+}
+
+p, span {
+    color: #191919;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+button {
+    cursor: pointer;
+    background: #2F46A7;
+    border-radius: 4px;
+    padding: 12px 16px;
+    color: #fff;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: none;
+}
+
 .container {
     display: flex;
     flex-direction: column;
-    margin-top: 70px;
+    margin-top: 120px;
     justify-content: center;
     align-items: center;
     align-content: center;
 }
 
+.installing_container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.installing_container > pre {
+    background-color: #3D3D3D;
+    color: #fff;
+    height: auto;
+    max-height: 220px;
+    overflow: auto;
+    word-break: normal !important;
+    word-wrap: normal !important;
+    white-space: pre !important;
+}
 
 #logo {
     width: 9rem;
 }
 
-p {
-    color: #191919;
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 1.2rem;
+
+#logo2 {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
+    margin-bottom: 30px;
 }
 
-.btnNextStep {
-    margin-left: 40px;
+
+
+.sidenav {
+height: 100%; 
+width: 160px; 
+position: fixed; 
+z-index: 1; 
+top: 0; 
+left: 0;
+background-color: #2F46A7; 
+overflow-x: hidden; 
+padding-top: 20px;
+}
+
+
+.sidenav button {
+border: none;
+font-weight: normal;
+padding: 6px 8px 16px 16px;
+text-decoration: none;
+font-size: 18px;
+color: #A0A6D2;
+display: block;
+display:flex;
+align-items:center;
+}
+
+.sidenav button i {
+    margin-right: 7px;
+}
+
+.sidenav a:hover {
+color: #f1f1f1;
+}
+
+.main {
+    background-color: #EFF3F6;
+    margin-left: 160px; 
+    padding: 40px 10px 10px 10px;
+
+}
+
+.main button {
+    padding: 4px 22px;
+    font-weight: normal;
+    font-size: 16px;
+    
+}
+
+.main input {
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    margin-left: 20px;
+}
+
+.main span {
+    color: #A0A6D2;
+    font-size: 13px;
+    display: block;
+    margin-left: 20px;
+}
+
+.inl {
+    display: flex;
+    margin-top: 20px;
+}
+
+@media screen and (max-height: 450px) {
+.sidenav {padding-top: 15px;}
+.sidenav a {font-size: 18px;}
+}
+
+.settings_screen {
+    padding: 20px;
+}
+
+.status {
+    position: absolute;
+    left: auto;
+    top: 10px;
+    right: 30px;
+    font-size: 14px;
+}
+
+.status button {
+    padding: 4px;
+    font-size: 11px;
+    font-weight: normal;
 }
