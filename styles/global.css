@@ -117,10 +117,13 @@ color: #f1f1f1;
     padding: 4px 22px;
     font-weight: normal;
     font-size: 16px;
+    margin-left: 20px;
+    margin-top: 10px;
     
 }
 
 .main input {
+    display: block;
     border: none;
     border-radius: 4px;
     padding: 5px 12px;
@@ -136,8 +139,36 @@ color: #f1f1f1;
 
 .inl {
     display: flex;
-    margin-top: 20px;
+    margin-top: 10px;
 }
+
+.inl + .inl + .inl{
+    margin-top: 60px;
+}
+
+.isl {
+    display: flex;
+    margin-top: 10px;
+}
+
+.link_btn {
+    border: none;
+    background-color: transparent;
+    color: #2F46A7;
+    display: inline-block;
+    margin-left: 0px!important;
+    margin-top: 2px!important;
+}
+
+.main select {
+    display: block;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    margin-left: 20px;
+
+}
+
 
 @media screen and (max-height: 450px) {
 .sidenav {padding-top: 15px;}
