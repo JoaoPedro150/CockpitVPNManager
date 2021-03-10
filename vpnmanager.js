@@ -10,6 +10,14 @@ const settingsScreen = document.getElementById('settings_screen');
 const clientsScreen = document.getElementById('clients_screen');
 const keysScreen = document.getElementById('keys_screen');
 
+
+const buttonSettingsScreen = document.getElementById('settings_screen_btn');    
+    buttonSettingsScreen.onclick = () => settingsScreenFn();
+const buttonClientsScreen = document.getElementById('clients_screen_btn');
+    buttonClientsScreen.onclick = () => clientsScreenFn();
+const buttonKeysScreen = document.getElementById('keys_screen_btn');
+    buttonKeysScreen.onclick = () => keysScreenFn();
+
 const divDashboard = document.getElementById('div-dashboard');
 const spanServiceStatus = document.getElementById('span-service-status');
 const btnToggleServiceState = document.getElementById('btn-toggle-service-state');
@@ -18,19 +26,19 @@ const btnRestartService = document.getElementById('btn-restart-service')
 
 const inputPort = document.getElementById("input-port");
 const btnChangePort = document.getElementById("btn-change-port");
-      btnChangePort.onclick =  () => changeConfig(btnChangePort, inputPort, "port", "[0-9]*");
+      //btnChangePort.onclick =  () => changeConfig(btnChangePort, inputPort, "port", "[0-9]*"); aaa
 
 const inputMaxClients = document.getElementById("input-max-client");
 const btnChangePMaxClients = document.getElementById("input-change-max-client");
-      btnChangePMaxClients.onclick = () => changeConfig(btnChangePMaxClients, inputMaxClients, "max-clients", "[0-9]*");
+      //btnChangePMaxClients.onclick = () => changeConfig(btnChangePMaxClients, inputMaxClients, "max-clients", "[0-9]*");
 
 const inputProtocol = document.getElementById("input-proto");
 const btnChangeProtocol = document.getElementById("btn-change-proto");
-      btnChangeProtocol.onclick = () => changeConfig(btnChangeProtocol, inputProtocol, "proto", "(udp|tcp)");
+      //btnChangeProtocol.onclick = () => changeConfig(btnChangeProtocol, inputProtocol, "proto", "(udp|tcp)");
 
 const inputDns = document.getElementById("input-dns");
 const btnChangeDns = document.getElementById("btn-change-dns");
-      btnChangeDns.onclick = changeDns;
+      //btnChangeDns.onclick = changeDns;
 
 const divVpnNotInstalled = document.getElementById('div-not-installed');
 const spanVpnNotInstallednformation = document.getElementById('span-not-installed-information');
@@ -181,6 +189,25 @@ cockpit.transport.wait(function() {
     hideExecutingStepScreen();
     isOpenVpnInstalled();
 });
+
+function settingsScreenFn(){
+    settingsScreen.style.setProperty("display", "block", "important");
+    clientsScreen.style.setProperty("display", "none", "important");
+    keysScreen.style.setProperty("display", "none", "important");
+}
+
+function clientsScreenFn(){
+    settingsScreen.style.setProperty("display", "none", "important");
+    clientsScreen.style.setProperty("display", "block", "important");
+    keysScreen.style.setProperty("display", "none", "important");
+}
+
+function keysScreenFn(){
+    settingsScreen.style.setProperty("display", "none", "important");
+    clientsScreen.style.setProperty("display", "none", "important");
+    keysScreen.style.setProperty("display", "block", "important");
+}
+
 
 // Utils.js
 function hideDashboard() {

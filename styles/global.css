@@ -169,6 +169,30 @@ color: #f1f1f1;
 
 }
 
+.content_table {
+    background-color: white;
+    border-radius: 11px;
+    width:80vw; margin:0 auto!important;
+    display: flex;
+    flex-direction: column!important;
+    margin-top: 30px!important;
+    justify-content: center!important;
+    align-items: center!important;
+    align-content: center!important;
+}
+
+table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    padding: 10px 10px;
+    white-space: nowrap!important;
+}
+
+#keys-actions {
+    display: inline-block;
+}
+
 
 @media screen and (max-height: 450px) {
 .sidenav {padding-top: 15px;}
