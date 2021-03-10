@@ -80,7 +80,7 @@ position: fixed;
 z-index: 1; 
 top: 0; 
 left: 0;
-background-color: #06c; 
+background-color: #151515; 
 overflow-x: hidden; 
 padding-top: 20px;
 }
@@ -88,6 +88,7 @@ padding-top: 20px;
 
 .sidenav button {
 border: none;
+background-color: transparent;
 font-weight: normal;
 padding: 6px 8px 16px 16px;
 text-decoration: none;
