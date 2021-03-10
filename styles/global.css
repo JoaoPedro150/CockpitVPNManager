@@ -1,0 +1,24 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 70px;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+
+#logo {
+    width: 9rem;
+}
+
+p {
+    color: #191919;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.btnNextStep {
+    margin-left: 40px;
+}
