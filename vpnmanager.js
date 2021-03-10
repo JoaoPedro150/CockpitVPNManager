@@ -42,6 +42,9 @@ const btnInstallVpn = document.getElementById('btn-install-vpn');
 
 const divSetupingVpn = document.getElementById('div-setuping-vpn');
 const setupingVpnOutput = document.getElementById('setuping-output');
+const errorOutput = document.getElementById('error_output');
+
+
 
 serverConf = "";
 
@@ -233,24 +236,32 @@ cockpit.transport.wait(function() {
 
 // Utils.js
 function hideDashboard() {
-    clientsScreen.style.display = 'none';
-    keysScreen.style.display = 'none';
-    divDashboard.style.display = 'none';
+    //clientsScreen.style.display = 'none';
+    //keysScreen.style.display = 'none';
+    //divDashboard.style.display = 'none';
+    clientsScreen.style.setProperty("display", "none", "important");
+    keysScreen.style.setProperty("display", "none", "important");
+    divDashboard.style.setProperty("display", "none", "important");
 }
 function showDashboard() {
-    divDashboard.style.display = 'block';
+    //divDashboard.style.display = 'block';
+    divDashboard.style.setProperty("display", "none", "important");
 }
 function hideNextStepScreen() {
-    divVpnNotInstalled.style.display = 'none';
+    //divVpnNotInstalled.style.display = 'none';
+    divVpnNotInstalled.style.setProperty("display", "none", "important");
 }
 function showNextStepScreen() {
-    divVpnNotInstalled.style.display = 'block';
+    //divVpnNotInstalled.style.display = 'block';
+    divVpnNotInstalled.style.setProperty("display", "flex", "important");
 }
 function showExecutingStepScreen() {
-    divSetupingVpn.style.display = 'block';
+    //divSetupingVpn.style.display = 'block';
+    divSetupingVpn.style.setProperty("display", "flex", "important");
 }
 function hideExecutingStepScreen() {
-    divSetupingVpn.style.display = 'none';
+    //divSetupingVpn.style.display = 'none';
+    divSetupingVpn.style.setProperty("display", "none", "important");
 }
 function clearOutput() {
     setupingVpnOutput.innerHTML = '';

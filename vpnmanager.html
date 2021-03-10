@@ -29,22 +29,22 @@
                         <div class="inl">
                             <div>
                                 <span>Port </span><input id="input-port"></input>
-                                <button id="btn-change-port">Save</button>
+                                <!--<button id="btn-change-port">Save</button>-->
                             </div>
                             <div>
                                 <span>Protocol </span><input id="input-proto"></input>
-                                <button id="btn-change-proto">Save</button>
+                                <!--<button id="btn-change-proto">Save</button>-->
                             </div>
                             <div>
                                 <span>DNS </span><input id="input-dns"></input>
-                                <button id="btn-change-dns">Save</button>
+                                <!--<button id="btn-change-dns">Save</button>-->
                             </div>
                         </div>
 
                         <div class="inl">
                             <div>
                                 <span>Max clients </span><input id="input-max-client"></input>
-                                <button id="input-change-max-client">Save</button>
+                                <!--<button id="input-change-max-client">Save</button>-->
                             </div>
                             <div>
                                 <span>Compression </span>
@@ -54,52 +54,57 @@
                                     <option value="lzo">LZ0</option>
                                     <option value="null">None</option>
                                 </select>
-                                <button id="input-change-max-client">Save</button>
+                                <!--<button id="input-change-max-client">Save</button>-->
                             </div>
-                            <div>
-                                <span>Certificate authority </span><input id="input-port2"></input>
-                                <button id="btn-change-port2">Save</button>
-                            </div>
-                            <div>
-                                <span>Local certificate </span><input id="input-proto3"></input>
-                                <button id="btn-change-proto3">Save</button>
-                            </div>
+                            
                         </div>
 
                         <div class="inl">
                             <div>
+                                <span>Certificate authority </span><input id="input-port2"></input>
+                                <!--<button id="btn-change-port2">Save</button>-->
+                            </div>
+                            <div>
+                                <span>Local certificate </span><input id="input-proto3"></input>
+                                <!--<button id="btn-change-proto3">Save</button>-->
+                            </div>
+                            
+                        </div>
+
+                        <div class="isl">
+                            <div>
                                 <span>Local private key </span><input id="input-port4"></input>
-                                <button id="btn-change-port4">Save</button>
+                                <!--<button id="btn-change-port4">Save</button>-->
                             </div>
                             <div>
                                 <span>tls-auth </span><input id="input-proto5"></input>
-                                <button id="btn-change-proto5">Save</button>
+                                <!--<button id="btn-change-proto5">Save</button>-->
                             </div>
+                            
                         </div>
-                        <br/><br/>
-                        <div class="inl">
+                        <div class="isl">
                             <div>
                                 <span>Maximum clients </span><input id="input-port6"></input>
-                                <button id="btn-change-port6">Save</button>
+                                <!--<button id="btn-change-port6">Save</button>-->
                             </div>
                             <div>
                                 <span>Compress algorithm </span><input id="input-proto7"></input>
-                                <button id="btn-change-proto7">Save</button>
+                                <!--<button id="btn-change-proto7">Save</button>-->
                             </div>
+                            
                         </div>
+                        <br/><br/><br/><br/>
                         <div>
                             <span>Push option </span><input id="input-port8"></input>
-                            <button id="btn-change-port8">Push</button>
+                            <button id="btn-change-port8" class="link_btn">Push</button>
                         </div>
                         <div>
                             <span>Interval </span><input id="input-port9"></input>
                             <span>Timeout </span><input id="input-proto9"></input>
-                            <button id="btn-change-port9">Keepalive</button>
+                            <button id="btn-change-port9" class="link_btn">Keepalive</button>
                         </div>
-                       
-
-                        
-                        
+                        <br/><br/><br/>
+                        <button id="btn-change-proto7">Save and Restart</button>
                     </div>
 
                     <div class="main" id="clients_screen">
@@ -121,7 +126,7 @@
                 <div id="div-setuping-vpn" class="installing_container">
                     <img src="./styles/logo01.png" alt="logo" id="logo">
                     <p>Installing and configuring OpenVPN...</p>
-
+                    <p id="error_output"></p>
                     <pre id="setuping-output"> </pre>
                 </div>
             </section>
