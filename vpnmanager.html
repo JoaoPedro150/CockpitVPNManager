@@ -28,59 +28,73 @@
                         </div>
                         <div class="inl">
                             <div>
-                                <span>Port </span><input id="input-vpn-port"></input>
-                                <button id="btn-change-vpn-port">Save</button>
+                                <span>Port </span><input id="input-port"></input>
+                                <button id="btn-change-port">Save</button>
                             </div>
                             <div>
-                                <span>Protocol </span><input id="input-vpn-proto"></input>
-                                <button id="btn-change-vpn-proto">Save</button>
+                                <span>Protocol </span><input id="input-proto"></input>
+                                <button id="btn-change-proto">Save</button>
                             </div>
                             <div>
-                                <span>DNS </span><input id="input-vpn-dns"></input>
-                                <button id="btn-change-vpn-proto">Save</button>
-                            </div>
-                        </div>
-
-                        <div class="inl">
-                            <div>
-                                <span>Certificate authority </span><input id="input-vpn-port2"></input>
-                                <button id="btn-change-vpn-port2">Save</button>
-                            </div>
-                            <div>
-                                <span>Local certificate </span><input id="input-vpn-proto3"></input>
-                                <button id="btn-change-vpn-proto3">Save</button>
+                                <span>DNS </span><input id="input-dns"></input>
+                                <button id="btn-change-dns">Save</button>
                             </div>
                         </div>
 
                         <div class="inl">
                             <div>
-                                <span>Local private key </span><input id="input-vpn-port4"></input>
-                                <button id="btn-change-vpn-port4">Save</button>
+                                <span>Max clients </span><input id="input-max-client"></input>
+                                <button id="input-change-max-client">Save</button>
                             </div>
                             <div>
-                                <span>tls-auth </span><input id="input-vpn-proto5"></input>
-                                <button id="btn-change-vpn-proto5">Save</button>
+                                <span>Compression </span>
+                                <select id="select-compression">
+                                    <option value="lz4-v2">LZ4-v2</option>
+                                    <option value="lz4" selected>LZ4</option>
+                                    <option value="lzo">LZ0</option>
+                                    <option value="null">None</option>
+                                </select>
+                                <button id="input-change-max-client">Save</button>
+                            </div>
+                            <div>
+                                <span>Certificate authority </span><input id="input-port2"></input>
+                                <button id="btn-change-port2">Save</button>
+                            </div>
+                            <div>
+                                <span>Local certificate </span><input id="input-proto3"></input>
+                                <button id="btn-change-proto3">Save</button>
+                            </div>
+                        </div>
+
+                        <div class="inl">
+                            <div>
+                                <span>Local private key </span><input id="input-port4"></input>
+                                <button id="btn-change-port4">Save</button>
+                            </div>
+                            <div>
+                                <span>tls-auth </span><input id="input-proto5"></input>
+                                <button id="btn-change-proto5">Save</button>
                             </div>
                         </div>
                         <br/><br/>
                         <div class="inl">
                             <div>
-                                <span>Maximum clients </span><input id="input-vpn-port6"></input>
-                                <button id="btn-change-vpn-port6">Save</button>
+                                <span>Maximum clients </span><input id="input-port6"></input>
+                                <button id="btn-change-port6">Save</button>
                             </div>
                             <div>
-                                <span>Compress algorithm </span><input id="input-vpn-proto7"></input>
-                                <button id="btn-change-vpn-proto7">Save</button>
+                                <span>Compress algorithm </span><input id="input-proto7"></input>
+                                <button id="btn-change-proto7">Save</button>
                             </div>
                         </div>
                         <div>
-                            <span>Push option </span><input id="input-vpn-port8"></input>
-                            <button id="btn-change-vpn-port8">Push</button>
+                            <span>Push option </span><input id="input-port8"></input>
+                            <button id="btn-change-port8">Push</button>
                         </div>
                         <div>
-                            <span>Interval </span><input id="input-vpn-port9"></input>
-                            <span>Timeout </span><input id="input-vpn-proto9"></input>
-                            <button id="btn-change-vpn-port9">Keepalive</button>
+                            <span>Interval </span><input id="input-port9"></input>
+                            <span>Timeout </span><input id="input-proto9"></input>
+                            <button id="btn-change-port9">Keepalive</button>
                         </div>
                        
 
@@ -97,10 +111,10 @@
                     </div>
                 </div>
                 <hr/>
-                <div id="div-vpn-not-installed" class="container">
+                <div id="div-not-installed" class="container">
                     <img src="./styles/logo01.png" alt="logo" id="logo">
                     <br />
-                    <span align="center" id="span-vpn-not-installed-information">It looks like you don't<br />have OpenVPN installed yet.</span>
+                    <span align="center" id="span-not-installed-information">It looks like you don't<br />have OpenVPN installed yet.</span>
                     <br />
                     <button id="btn-install-vpn">Install OpenVPN</button>
                 </div>
@@ -108,7 +122,7 @@
                     <img src="./styles/logo01.png" alt="logo" id="logo">
                     <p>Installing and configuring OpenVPN...</p>
 
-                    <pre id="setuping-vpn-output"> </pre>
+                    <pre id="setuping-output"> </pre>
                 </div>
             </section>
         </main>

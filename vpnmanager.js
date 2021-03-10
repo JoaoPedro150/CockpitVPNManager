@@ -16,63 +16,65 @@ const btnToggleServiceState = document.getElementById('btn-toggle-service-state'
 const btnRestartService = document.getElementById('btn-restart-service')
       btnRestartService.onclick = () => execute({command: ['systemctl', 'restart', 'openvpn-server@server'], next:setServiceState});
 
-const inputVpnPort = document.getElementById("input-vpn-port");
-const btnChangeVpnPort = document.getElementById("btn-change-vpn-port");
-      btnChangeVpnPort.onclick =  () => changeConfig(btnChangeVpnPort, inputVpnPort, "port", "[0-9]*");
+const inputPort = document.getElementById("input-port");
+const btnChangePort = document.getElementById("btn-change-port");
+      btnChangePort.onclick =  () => changeConfig(btnChangePort, inputPort, "port", "[0-9]*");
 
-const inputVpnProtocol = document.getElementById("input-vpn-proto");
-const btnChangeVpnProtocol = document.getElementById("btn-change-vpn-proto");
-      btnChangeVpnProtocol.onclick = () => changeConfig(btnChangeVpnProtocol, inputVpnProtocol, "proto", "udp|tcp");
+const inputMaxClients = document.getElementById("input-max-client");
+const btnChangePMaxClients = document.getElementById("input-change-max-client");
+      btnChangePMaxClients.onclick = () => changeConfig(btnChangePMaxClients, inputMaxClients, "max-clients", "[0-9]*");
 
-const inputVpnDns = document.getElementById("input-vpn-dns");
-const btnChangeVpnDns = document.getElementById("btn-change-vpn-dns");
-      btnChangeVpnDns.onclick = changeDns;
+const inputProtocol = document.getElementById("input-proto");
+const btnChangeProtocol = document.getElementById("btn-change-proto");
+      btnChangeProtocol.onclick = () => changeConfig(btnChangeProtocol, inputProtocol, "proto", "(udp|tcp)");
 
-const divVpnNotInstalled = document.getElementById('div-vpn-not-installed');
-const spanVpnNotInstallednformation = document.getElementById('span-vpn-not-installed-information');
+const inputDns = document.getElementById("input-dns");
+const btnChangeDns = document.getElementById("btn-change-dns");
+      btnChangeDns.onclick = changeDns;
+
+const divVpnNotInstalled = document.getElementById('div-not-installed');
+const spanVpnNotInstallednformation = document.getElementById('span-not-installed-information');
 const btnInstallVpn = document.getElementById('btn-install-vpn');
       btnInstallVpn.onclick = installOpenVPN;
 
 const divSetupingVpn = document.getElementById('div-setuping-vpn');
-const setupingVpnOutput = document.getElementById('setuping-vpn-output');
+const setupingVpnOutput = document.getElementById('setuping-output');
 
 function drawDashboard(data) {
     hideNextStepScreen();
     hideExecutingStepScreen();
     setServiceState();
-    getVpnConfig(btnChangeVpnPort, inputVpnPort, "port", "[0-9]*");
-    getVpnConfig(btnChangeVpnProtocol, inputVpnProtocol, "proto", "udp|tcp");
+    getConfig(btnChangePort, inputPort, "port", "[0-9]*");
+    getConfig(btnChangeProtocol, inputProtocol, "proto", "udp|tcp");
+    getConfig(btnChangePMaxClients, inputMaxClients, "max-clients", "[0-9]*");
     getVpnDns();
     showDashboard();    
 }
 
 function getVpnDns() {
-    inputVpnDns.value = "Please wait...";
-    inputVpnDns.disabled = true;
-    btnChangeVpnDns.disabled = true;
+    inputDns.value = "Please wait...";
+    inputDns.disabled = true;
+    btnChangeDns.disabled = true;
 
     execute({
         script: `grep -E -o '^push "dhcp-option DNS [0-9]\.[0-9]\.[0-9]\.[0-9]"$' /etc/openvpn/server.conf | grep -E -o [0-9]\.[0-9]\.[0-9]\.[0-9]`,
         stream: (data) => {
-            inputVpnDns.disabled=false;
-            btnChangeVpnDns.disabled = false;
+            inputDns.disabled=false;
+            btnChangeDns.disabled = false;
             let dns =  data.split('\n');
-            console.log(dns);
-            inputVpnDns.value = dns[0] + ((dns[1]?.length > 1) ? ", " + dns[1] : "");
+            inputDns.value = dns[0] + ((dns[1]?.length > 1) ? ", " + dns[1] : "");
         }
     });
 }
 
 function changeDns() {
-    let dns = inputVpnDns.value.split(',');
+    let dns = inputDns.value.split(',');
     let dns1 = dns[0]?.trim();
     let dns2 = dns[1]?.trim();
 
-    inputVpnDns.value = "Please wait...";
-    inputVpnDns.disabled = true;
-    btnChangeVpnDns.disabled = true;
-
-
+    inputDns.value = "Please wait...";
+    inputDns.disabled = true;
+    btnChangeDns.disabled = true;
 
     let script = `sed -i.bak -e '/push "dhcp-option DNS [0-9]\.[0-9]\.[0-9]\.[0-9]"/d' /etc/openvpn/server.conf\n`;
 
@@ -142,19 +144,19 @@ function installOpenVPN() {
 }
 
 function changeConfig(btn, input, config, regex) {
-    let command = ['sed', '-i', '-e', `s/^${config} ${regex}/${config} ${input.value}/g`, '/etc/openvpn/server.conf'];
+    let command = ['sed', '-i', '-E', `s/^${config} ${regex}/${config} ${input.value}/g`, '/etc/openvpn/server.conf'];
     input.value = "Please wait...";
     input.disabled = true;
     btn.disabled = true;
 
     execute({
         command: command,
-        next: () => getVpnConfig(btn, input, config, regex)
+        next: () => getConfig(btn, input, config, regex)
     });
 }
 
 
-function getVpnConfig(btn, input, config, regex) {
+function getConfig(btn, input, config, regex) {
     input.value = "Please wait...";
     input.disabled = true;
     btn.disabled = true;
@@ -163,7 +165,7 @@ function getVpnConfig(btn, input, config, regex) {
         script: `grep -o -E "${config} ${regex}" /etc/openvpn/server.conf | grep -o -E '${regex}'`,
         stream: (data) => {
             input.value = data;
-            input.disabled=false;
+            input.disabled = false;
             btn.disabled = false;
         }
     });
