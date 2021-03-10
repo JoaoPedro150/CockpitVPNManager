@@ -1,26 +1,26 @@
 * {
-    font-family: monospace;
+    font-family: Open Sans,Helvetica,Arial,sans-serif;
     
  }
 
 body {
-    background-color: #EFF3F6;
+    background-color: #fff;
 }
 
 p, span {
     color: #191919;
-    font-family: monospace;
+    font-family: Open Sans,Helvetica,Arial,sans-serif;
     font-weight: bold;
     font-size: 1rem;
 }
 
 button {
     cursor: pointer;
-    background: #2F46A7;
+    background: #06c;
     border-radius: 4px;
     padding: 12px 16px;
     color: #fff;
-    font-family: monospace;
+    font-family: Open Sans,Helvetica,Arial,sans-serif;
     font-weight: bold;
     font-size: 1.1rem;
     border: none;
@@ -80,7 +80,7 @@ position: fixed;
 z-index: 1; 
 top: 0; 
 left: 0;
-background-color: #2F46A7; 
+background-color: #151515; 
 overflow-x: hidden; 
 padding-top: 20px;
 }
@@ -88,11 +88,12 @@ padding-top: 20px;
 
 .sidenav button {
 border: none;
+background-color: transparent;
 font-weight: normal;
 padding: 6px 8px 16px 16px;
 text-decoration: none;
 font-size: 18px;
-color: #A0A6D2;
+color: #d2d2d2;
 display: block;
 display:flex;
 align-items:center;
@@ -107,7 +108,7 @@ color: #f1f1f1;
 }
 
 .main {
-    background-color: #EFF3F6;
+    background-color: #fff;
     margin-left: 160px; 
     padding: 40px 10px 10px 10px;
 
@@ -123,6 +124,7 @@ color: #f1f1f1;
 }
 
 .main input {
+    background-color: #f5f5f5;
     display: block;
     border: none;
     border-radius: 4px;
@@ -131,7 +133,7 @@ color: #f1f1f1;
 }
 
 .main span {
-    color: #A0A6D2;
+    color: #d2d2d2;
     font-size: 13px;
     display: block;
     margin-left: 20px;
@@ -154,19 +156,44 @@ color: #f1f1f1;
 .link_btn {
     border: none;
     background-color: transparent;
-    color: #2F46A7;
+    color: #06c;
     display: inline-block;
     margin-left: 0px!important;
     margin-top: 2px!important;
 }
 
 .main select {
+    background-color: #f5f5f5;
     display: block;
     border: none;
     border-radius: 4px;
     padding: 5px 12px;
     margin-left: 20px;
 
+}
+
+.content_table {
+    background-color: #f5f5f5;
+    border-radius: 11px;
+    width:80vw; margin:0 auto!important;
+    display: flex;
+    flex-direction: column!important;
+    margin-top: 30px!important;
+    justify-content: center!important;
+    align-items: center!important;
+    align-content: center!important;
+}
+
+table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    padding: 10px 10px;
+    white-space: nowrap!important;
+}
+
+#keys-actions {
+    display: inline-block;
 }
 
 
