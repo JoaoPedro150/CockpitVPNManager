@@ -25,40 +25,79 @@ const btnRestartService = document.getElementById('btn-restart-service')
       btnRestartService.onclick = restartServer;
 
 const inputPort = document.getElementById("input-port");
-const btnChangePort = document.getElementById("btn-change-port");
-      btnChangePort.onclick =  () => changeConfig(inputPort, "port", "  *");
-
 const inputMaxClients = document.getElementById("input-max-client");
-const btnChangePMaxClients = document.getElementById("input-change-max-client");
-      btnChangePMaxClients.onclick = () => changeConfig(inputMaxClients, "max-clients", "[0-9]*");
-
-const inputProtocol = document.getElementById("input-proto");
-const btnChangeProtocol = document.getElementById("btn-change-proto");
-      btnChangeProtocol.onclick = () => changeConfig(inputProtocol, "proto", "(udp|tcp)");
-
+const selectProtocol = document.getElementById("select-proto");
 const inputDns = document.getElementById("input-dns");
-const btnChangeDns = document.getElementById("btn-change-dns");
-      //btnChangeDns.onclick = changeDns;
-
 const selectCompression = document.getElementById("select-compression");
-      btnChangeDns.onchange = changeCompression;
 
 const divVpnNotInstalled = document.getElementById('div-not-installed');
 const spanVpnNotInstallednformation = document.getElementById('span-not-installed-information');
 const btnInstallVpn = document.getElementById('btn-install-vpn');
       btnInstallVpn.onclick = installOpenVPN;
 
+const btnApplyChanges = document.getElementById('btn-apply');
+      btnApplyChanges.onclick = updateServer;
+
 const divSetupingVpn = document.getElementById('div-setuping-vpn');
 const setupingVpnOutput = document.getElementById('setuping-output');
-const errorOutput = document.getElementById('error_output');
-
-
 
 serverConf = "";
 
 function drawDashboard(data) {
     hideNextStepScreen();
     hideExecutingStepScreen();
+    loadConfig();
+    showDashboard();    
+}
+
+function loadConfig() {
+    let inputs =  [inputDns, inputMaxClients, inputPort, selectProtocol, selectCompression];
+
+    function setServiceState() {
+        execute({
+            command: ['systemctl', 'show', '-p', 'SubState', '--value', 'openvpn-server@server'],
+            stream: (data) => {
+                spanServiceStatus.innerHTML = data;
+                
+                if (data === "running\n") {
+                    btnToggleServiceState.innerHTML = "Stop";
+                    btnToggleServiceState.onclick = () => execute({command: ['systemctl', 'stop', 'openvpn-server@server'], next:setServiceState});
+                }
+                else {
+                    btnToggleServiceState.innerHTML = "Start";
+                    btnToggleServiceState.onclick = () => execute({command: ['systemctl', 'start', 'openvpn-server@server'], next:setServiceState});
+                } 
+            }
+        });
+    }    
+
+    function getConfig(input, regex) {
+        input.value = serverConf.match(new RegExp(regex))[1];
+    }
+
+    function getLimitedConfig(input, regex) {
+        let match = serverConf.match(new RegExp(regex));
+    
+        if (match == undefined) {
+            input.value = "null";
+        }
+        else {
+            input.value = match[1];
+        }
+    }
+    
+    function getDns() {
+        inputDns.value = "";
+    
+        let match = serverConf.match(/^push "dhcp-option DNS \d+\.\d+\.\d+\.\d+"\n?/gm);
+        match.forEach(element => {
+            let match = element.match(/push "dhcp-option DNS (\d+\.\d+\.\d+\.\d+)"/);
+    
+            inputDns.value += match[1] + ", ";
+        });
+    
+        inputDns.value = inputDns.value.replace(/, $/g,'');
+    }
 
     execute({
         command: ["cat", "/etc/openvpn/server.conf"],
@@ -66,127 +105,69 @@ function drawDashboard(data) {
             serverConf = data;
             setServiceState();
             getConfig(inputPort, "port ([0-9]*)");
-            getConfig(inputProtocol, "proto (udp|tcp)");
             getConfig(inputMaxClients, "max-clients ([0-9]*)");
+            getConfig(selectProtocol,);
+            getLimitedConfig(selectCompression, /^compress (lz4-v2|lz4|lzo)$/m);
+            getLimitedConfig(selectProtocol, /^proto (udp|tcp)$/m);
             getDns();
-            getCompression();
+            inputs.forEach(input => {
+                input.disabled = false;
+            })
         }
-    });
-    
-    showDashboard();    
+    })
 }
 
+
 function restartServer() {
-    let inputs =  [inputDns, inputMaxClients, inputPort, inputProtocol];
+    spanServiceStatus.innerHTML = "Restarting...";
+    let inputs =  [inputDns, inputMaxClients, inputPort, selectProtocol, selectCompression];
 
     inputs.forEach(input => {
         input.disabled = true;
         input.value = "...";
-    })
+    });
     
     execute({
         command: ['systemctl', 'restart', 'openvpn-server@server'],
-        next: execute({
-            command: ["cat", "/etc/openvpn/server.conf"],
-            stream: (data) => {
-                serverConf = data;
-                setServiceState();
-                getConfig(inputPort, "port ([0-9]*)");
-                getConfig(inputProtocol, "proto (udp|tcp)");
-                getConfig(inputMaxClients, "max-clients ([0-9]*)");
-                getDns();
-                getCompression();
-                inputs.forEach(input => {
-                    input.disabled = false;
-                })
-            }
-        })
+        next: loadConfig
     });
 }
 
 function updateServer() {
+    serverConf = serverConf.replace(/^proto (udp|tcp)$/m, `proto ${selectProtocol.value}`);
+    serverConf = serverConf.replace(/^port [0-9]*$/m, `port ${inputPort.value}`);
+    serverConf = serverConf.replace(/^max-clients ([0-9]*)$/m, `max-clients ${inputMaxClients.value}`);
+
+    function changeCompress() {
+        let disabled = selectCompression.value === "null";
+
+        if (disabled) {
+            selectCompression.value = "lz4-v2";
+        }
+
+        serverConf = serverConf.replace(/^;?compress (lz4-v2|lz4|lzo)$/m, `${disabled ? ";" : ""}compress ${selectCompression.value}`);
+        serverConf = serverConf.replace(/^;?push "compress (lz4-v2|lz4|lzo)"$/m, `${disabled ? ";" : ""}push "compress ${selectCompression.value}"`);
+    }
+
+    function changeDns() {
+        let dns = inputDns.value.split(',');
+        let dns1 = dns[0]?.trim();
+        let dns2 = dns[1]?.trim();
+    
+        serverConf = serverConf.replace(/^push "dhcp-option DNS \d+\.\d+\.\d+\.\d+"\n?/gm, "");
+    
+        if (dns1 != undefined)
+            serverConf += `push "dhcp-option DNS ${dns1}"\n`;
+        if (dns2 != undefined)
+            serverConf += `push "dhcp-option DNS ${dns2}"`;
+    }
+
+    changeDns();
+    changeCompress();
+
     execute({
         script: `echo '${serverConf}' > /etc/openvpn/server.conf`,
         next: restartServer
-    });
-}
-
-function getCompression() {
-    selectCompression.disabled = true;
-
-    let match = serverConf.match(/^;compress (lz4-v2|lz4|lzo)$/m);
-
-    if (match[1] == undefined) {
-        selectCompression.value = "null";
-    }
-    else {
-        selectCompression.value = match[1];
-    }
-
-    
-    selectCompression.disabled = false;
-}
-
-function getDns() {
-    inputDns.value = "";
-
-    let match = serverConf.match(/^push "dhcp-option DNS \d+\.\d+\.\d+\.\d+"$/gm);
-
-    match.forEach(element => {
-        let match = element.match(/push "dhcp-option DNS (\d+\.\d+\.\d+\.\d+)"/);
-
-        inputDns.value += match[1] + ", ";
-    });
-
-    inputDns.value = inputDns.value.replace(/, $/g,'');
-}
-
-function changeDns() {
-    let dns = inputDns.value.split(',');
-    let dns1 = dns[0]?.trim();
-    let dns2 = dns[1]?.trim();
-
-    serverConf = serverConf.replace(/^push "dhcp-option DNS \d+\.\d+\.\d+\.\d+"\n?/gm, "");
-
-    if (dns1 != undefined)
-        serverConf += `push "dhcp-option DNS ${dns1}"\n`;
-    if (dns2 != undefined)
-        serverConf += `push "dhcp-option DNS ${dns2}"`;
-
-    updateServer();
-}
-
-function changeCompression() {
-    let script = `sed -i.bak -e '/push "dhcp-option DNS \d+\.\d+\.\d+\.\d+"/d' /etc/openvpn/server.conf\n`;
-
-    if (dns1 != undefined) {
-        script += `echo 'push "dhcp-option DNS ${dns1}"' >> /etc/openvpn/server.conf\n`;
-    }
-    if (dns2 != undefined) {
-        script += `echo 'push "dhcp-option DNS ${dns2}"' >> /etc/openvpn/server.conf`;
-    }
-
-    execute({
-        script: script,
-        next: getDns
-    });
-}
-
-function setServiceState() {
-    execute({
-        command: ['systemctl', 'show', '-p', 'SubState', '--value', 'openvpn-server@server'],
-        stream: (data) => {
-            spanServiceStatus.innerHTML = data;
-            
-            if (data === "running\n") {
-                btnToggleServiceState.innerHTML = "Stop";
-                btnToggleServiceState.onclick = () => execute({command: ['systemctl', 'stop', 'openvpn-server@server'], next:setServiceState});
-            }
-            else {
-                btnToggleServiceState.innerHTML = "Start";
-                btnToggleServiceState.onclick = () => execute({command: ['systemctl', 'start', 'openvpn-server@server'], next:setServiceState});
-            } 
-        }
     });
 }
 
@@ -224,16 +205,6 @@ function installOpenVPN() {
     .catch(writeError);
 }
 
-function changeConfig(input, config, regex) {
-    serverConf = serverConf.replace(new RegExp(`${config} ${regex}`), `${config} ${input.value}`);
-    updateServer();
-}
-
-
-function getConfig(input, regex) {
-    input.value = serverConf.match(new RegExp(regex))[1];
-}
-
 // Não tenho ctz se aqui é o lugar correto para executar as primeiras verificações.
 // Não procurei nada sobre OnDocumentLoaded()
 cockpit.transport.wait(function() { 
@@ -263,32 +234,24 @@ function keysScreenFn(){
 
 // Utils.js
 function hideDashboard() {
-    //clientsScreen.style.display = 'none';
-    //keysScreen.style.display = 'none';
-    //divDashboard.style.display = 'none';
-    clientsScreen.style.setProperty("display", "none", "important");
-    keysScreen.style.setProperty("display", "none", "important");
-    divDashboard.style.setProperty("display", "none", "important");
+    clientsScreen.style.display = 'none';
+    keysScreen.style.display = 'none';
+    divDashboard.style.display = 'none';
 }
 function showDashboard() {
-    //divDashboard.style.display = 'block';
-    divDashboard.style.setProperty("display", "none", "important");
+    divDashboard.style.display = 'block';
 }
 function hideNextStepScreen() {
-    //divVpnNotInstalled.style.display = 'none';
-    divVpnNotInstalled.style.setProperty("display", "none", "important");
+    divVpnNotInstalled.style.display = 'none';
 }
 function showNextStepScreen() {
-    //divVpnNotInstalled.style.display = 'block';
-    divVpnNotInstalled.style.setProperty("display", "flex", "important");
+    divVpnNotInstalled.style.display = 'block';
 }
 function showExecutingStepScreen() {
-    //divSetupingVpn.style.display = 'block';
-    divSetupingVpn.style.setProperty("display", "flex", "important");
+    divSetupingVpn.style.display = 'block';
 }
 function hideExecutingStepScreen() {
-    //divSetupingVpn.style.display = 'none';
-    divSetupingVpn.style.setProperty("display", "none", "important");
+    divSetupingVpn.style.display = 'none';
 }
 function clearOutput() {
     setupingVpnOutput.innerHTML = '';
