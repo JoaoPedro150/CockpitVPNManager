@@ -7,7 +7,7 @@ Group:          Productivity/Networking/Security
 License:        LGPL
 URL:            https://github.com/JoaoPedro150/CockpitVPNManager
 %undefine _disable_source_fetch
-Source0:        https://github.com/JoaoPedro150/CockpitVPNManager/cockpitvpnmanager.tar.gz
+Source:         https://github.com/JoaoPedro150/CockpitVPNManager/blob/main/cockpitvpnmanager.tar.gz
 
 Requires:       bash    cockpit >= 224.2
 
@@ -15,7 +15,7 @@ Requires:       bash    cockpit >= 224.2
 A OpenVpn manager plugin for cockpit on CentOS.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}
 
 %build
 
@@ -32,5 +32,3 @@ cp CockpitVPNManager/* ~/.local/share/cockpit/cockpit/CockpitVPNManager/
 
 
 %changelog
-
-~
