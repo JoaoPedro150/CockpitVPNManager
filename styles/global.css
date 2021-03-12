@@ -48,10 +48,8 @@ button {
 .installing_container > pre {
     background-color: #3D3D3D;
     color: #fff;
-    height: auto;
+    height: 65vh;
     min-height: 190px;
-    max-height: 190px;
-    width: 450px;
     overflow: auto;
     word-break: normal !important;
     word-wrap: normal !important;
