@@ -7,7 +7,7 @@ Group:          Productivity/Networking/Security
 License:        LGPL
 URL:            https://github.com/JoaoPedro150/CockpitVPNManager
 %undefine _disable_source_fetch
-Source0:        https://github.com/JoaoPedro150/CockpitVPNManager/v1.0.0-openvpnmanager.tar.gz
+Source0:        https://github.com/JoaoPedro150/CockpitVPNManager/cockpitvpnmanager.tar.gz
 
 Requires:       bash    cockpit >= 224.2
 
