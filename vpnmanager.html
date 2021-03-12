@@ -17,6 +17,7 @@
                         <button type="button" id="settings_screen_btn">Settings</button>
                         <button type="button" id="clients_screen_btn">Clients</a></button>
                         <button type="button" id="keys_screen_btn">Keys</a></button>
+                        <button type="button" id="logs_screen_btn">Logs</a></button>
                     </div>
 
                     <!------------------------------------------ SETTINGS ----------------------------------------->
@@ -24,7 +25,7 @@
                     <div class="main" id="settings_screen">
                         
                         <div class="status">
-                            <span>Status: </span><span id="span-service-status"></span>
+                            <span id="span-service-state"></span>
                             <button id="btn-toggle-service-state"></button>
                             <button id="btn-restart-service">Restart</button>
                         </div>
@@ -70,25 +71,8 @@
 
                     <div class="main" id="clients_screen">
                         <div class="content_table">
-                            <table style="width:100%;">
-                                <tr>
-                                  <th>Client</th>
-                                  <th>Name</th>
-                                  <th>Status</th>
-                                  <th>Actions</th>
-                                </tr>
-                                <tr>
-                                  <td>52.220.50.92</td>
-                                  <td>Client 01</td>
-                                  <td>Connect</td>
-                                  <td><button id="btn-remove-client">Remove</button></td>
-                                </tr>
-                                <tr>
-                                  <td>52.220.50.92</td>
-                                  <td>Client 02</td>
-                                  <td>Connect</td>
-                                  <td><button id="btn-remove-client">Remove</button></td>
-                                </tr>
+                            <button id="btn-update-table-clients">Update</button>
+                            <table style="width:100%;" id="table-clients">
                               </table>
                         </div>
                     </div>
@@ -97,33 +81,17 @@
 
                     <div class="main" id="keys_screen">
                         <div class="content_table">
-                            <table style="width:100%;">
-                                <tr>
-                                    <th>Key</th>
-                                    <th>Expiration</th>
-                                    <th>Client Name</th>
-                                    <th>Actions</th>
-                                </tr>
-                                <tr>
-                                    <td>path/file.key</td>
-                                    <td>08-10-21(Valid)</td>
-                                    <td>Client 01</td>
-                                    <td><button id="btn-remove-client">Remove</button></td>
-                                </tr>
-                                <tr>
-                                    <td>path/file02.key</td>
-                                    <td>08-10-21(Valid)</td>
-                                    <td>Client 02</td>
-                                    <td><button id="btn-remove-client">Remove</button></td>
-                                </tr>
+                            <table style="width:100%;" id="keys-table">
                             </table>
                         </div>
+                        <span>Client name: </span>
+                        <input id="client-name"></input>
+                        <button id="btn-add-key">Add key</button>
                         <br />
-                        <div id="keys-actions">
-                            <button id="btn-revoke-certificate">Revoke certificate</button>
-                            <button id="btn-export-ovpn">Export .ovpn</button>
-                            <button id="btn-add-key">Add key</button>
-                        </div>
+                    </div>
+
+                    <div class="main" id="logs_screen">
+                        <pre id="logs-output"></pre>
                     </div>
                 </div>
                 <hr/>
