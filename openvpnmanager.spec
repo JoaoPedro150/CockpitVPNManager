@@ -1,34 +1,49 @@
-Name:           openvpnmanager
-Version:        1.0.0
-Release:        1
-Summary:        A OpenVpn manager plugin for cockpit on CentOS.
+Name: cockpitvpnmanager
+Version: 1.0                      
+Release: 1%{?dist}                 
+Summary: A OpenVpn manager plugin for cockpit on CentOS.
+Group: Productivity/Networking/Security            
+License: LGPL
+# URL:
+Source0: cockpitvpnmanager-1.0.tar.gz    
+BuildArch: noarch                  
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Group:          Productivity/Networking/Security
-License:        LGPL
-URL:            https://github.com/JoaoPedro150/CockpitVPNManager
-%undefine _disable_source_fetch
-Source:         https://github.com/JoaoPedro150/CockpitVPNManager/blob/main/cockpitvpnmanager.tar.gz
+# BuildRequires:                   
 
-Requires:       bash    cockpit >= 224.2
+# Requires:                        
 
 %description
-A OpenVpn manager plugin for cockpit on CentOS.
+A OpenVpn manager plugin for cockpit on CentOS
 
 %prep
-%setup -q -n %{name}-%{version}
+
+%setup -q
 
 %build
+# %configure                      
+# make %{?_smp_mflags}                   
 
 %install
-rm -rf ~/.local/share/cockpit/CockpitVPNManager
-mkdir -p ~/.local/share/cockpit/CockpitVPNManager
-cp CockpitVPNManager/* ~/.local/share/cockpit/cockpit/CockpitVPNManager/
+
+rm -rf $RPM_BUILD_ROOT
+
+# make install DESTDIR=$RPM_BUILD_ROOT    
+
+install -d -m 0755 ~/.local/share/cockpit/CockpitVPNManager
+#install -m 0755 HelloWorld.sh $RPM_BUILD_ROOT/opt/HelloWorld/HelloWorld.sh
+
 
 %clean
 
+rm -rf $RPM_BUILD_ROOT
 
 %files
-~/.local/share/cockpit/CockpitVPNManager
 
+%defattr(-,root,root,-)
+
+# %doc
+
+#/opt/HelloWorld/HelloWorld.sh       <--- We confirm the file(s) to install
 
 %changelog
