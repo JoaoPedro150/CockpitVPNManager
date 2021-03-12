@@ -18,17 +18,18 @@
                         <button type="button" id="clients_screen_btn">Clients</a></button>
                         <button type="button" id="keys_screen_btn">Keys</a></button>
                         <button type="button" id="logs_screen_btn">Logs</a></button>
+                        <div class="status">
+                            <span id="span-service-state"></span>
+                            <button id="btn-toggle-service-state"></button>
+                            <button id="btn-restart-service">Restart</button>
+                        </div>
                     </div>
 
                     <!------------------------------------------ SETTINGS ----------------------------------------->
                       
                     <div class="main" id="settings_screen">
                         
-                        <div class="status">
-                            <span id="span-service-state"></span>
-                            <button id="btn-toggle-service-state"></button>
-                            <button id="btn-restart-service">Restart</button>
-                        </div>
+                        
                         <div class="inl">
                             <div>
                                 <span>Port </span><input id="input-port"></input>
@@ -73,7 +74,7 @@
                         <div class="content_table">
                             <button id="btn-update-table-clients">Update</button>
                             <table style="width:100%;" id="table-clients">
-                              </table>
+                            </table>
                         </div>
                     </div>
 

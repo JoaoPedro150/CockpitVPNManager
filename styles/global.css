@@ -4,7 +4,7 @@
  }
 
 body {
-    background-color: #fff;
+    background-color: #f0f0f0;
 }
 
 p, span {
@@ -106,7 +106,7 @@ color: #f1f1f1;
 }
 
 .main {
-    background-color: #fff;
+    background-color: #f0f0f0;
     margin-left: 160px; 
     padding: 40px 10px 10px 10px;
 
@@ -121,17 +121,37 @@ color: #f1f1f1;
     
 }
 
+#btn-restart-service {
+    background-color: #06c;
+    padding: 4px 22px;
+    font-weight: normal;
+    font-size: 16px;
+    margin-left: 20px;
+    margin-top: 10px;
+    
+}
+
+#btn-toggle-service-state {
+    background-color: #06c;
+    padding: 4px 22px;
+    font-weight: normal;
+    font-size: 16px;
+    margin-left: 20px;
+    margin-top: 10px;
+    
+}
+
 .main input {
     background-color: #f5f5f5;
     display: block;
-    border: 1px solid #bdbdbd;
+    border: 1px solid #e4e4e4;
     border-radius: 4px;
     padding: 5px 12px;
     margin-left: 20px;
 }
 
 .main span {
-    color: #d2d2d2;
+    color: #000;
     font-size: 13px;
     display: block;
     margin-left: 20px;
@@ -163,7 +183,7 @@ color: #f1f1f1;
 .main select {
     background-color: #f5f5f5;
     display: block;
-    border: 1px solid #bdbdbd;
+    border: 1px solid #e4e4e4;
     border-radius: 4px;
     padding: 5px 12px;
     margin-left: 20px;
@@ -206,9 +226,9 @@ table {
 
 .status {
     position: absolute;
-    left: auto;
-    top: 10px;
-    right: 30px;
+    top: auto;
+    left: 5px;
+    bottom: 40px;
     font-size: 14px;
 }
 
@@ -216,4 +236,14 @@ table {
     padding: 4px;
     font-size: 11px;
     font-weight: normal;
+}
+
+.removebtn {
+    columns: white;
+    background-color: red;
+}
+
+.content_table td {
+    text-align: center; 
+    vertical-align: middle;
 }

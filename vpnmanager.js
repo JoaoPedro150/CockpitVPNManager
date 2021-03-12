@@ -44,6 +44,7 @@ const divSetupingVpn = document.getElementById('div-setuping-vpn');
 const setupingVpnOutput = document.getElementById('setuping-output');
 
 const logsOutput = document.getElementById('logs-output');
+const errorOutput = document.getElementById('error_output');
 
 serverConf = "";
 clientTemplate = "";
@@ -357,9 +358,7 @@ function updateKeysTable() {
                     </td>
                     <td>
                         <button id="btn-export-ovpn-${match.value[1]}">Download .ovpn</button>
-                    </td>
-                    <td>
-                        <button id="btn-remove-key-${match.value[1]}">Remove</button>
+                        <button class="removebtn" id="btn-remove-key-${match.value[1]}">Remove</button>
                     </td>
                 </tr>`)
                 match = iterator.next();
