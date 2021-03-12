@@ -145,6 +145,7 @@ function loadConfig() {
     execute({
         script: "ip -4 addr | sed -ne 's|^.* inet \\([^/]*\\)/.* scope global.*$|\\1|p' | head -1",
         stream: (data) => {
+            console.log(data);
             localIp = data.replace('\n','');
         }
     });
@@ -253,9 +254,12 @@ function installOpenVPN() {
     showExecutingStepScreen();
     
     cockpit.script("./installation.sh", {
-         directory: "/usr/share/cockpit/pinger" 
+         directory: "/usr/share/cockpit/vpnmanager" 
     })
-    .stream(writeOutput)
+    .stream((output) => {
+        writeOutput(output);
+        setTimeout(() => window.scrollBy(0,100000),10);
+    })
     .then(drawDashboard)
     .catch(writeError);
 }

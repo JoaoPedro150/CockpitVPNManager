@@ -207,13 +207,6 @@ function installQuestions() {
 	if [[ $APPROVE_IP =~ n ]]; then
 		read -rp "IP address: " -e -i "$IP" IP
 	fi
-	# If $IP is a private IP address, the server must be behind NAT
-	if echo "$IP" | grep -qE '^(10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|192\.168)'; then
-		PUBLICIP=$(curl -s https://api.ipify.org)
-		until [[ $ENDPOINT != "" ]]; do
-			read -rp "Public IPv4 address or hostname: " -e -i "$PUBLICIP" ENDPOINT
-		done
-	fi
 
 	echo ""
 	echo "Checking for IPv6 connectivity..."
@@ -518,14 +511,6 @@ function installOpenVPN() {
 		CLIENT=${CLIENT:-client}
 		PASS=${PASS:-1}
 		CONTINUE=${CONTINUE:-y}
-
-		# Behind NAT, we'll default to the publicly reachable IPv4/IPv6.
-		if [[ $IPV6_SUPPORT == "y" ]]; then
-			PUBLIC_IP=$(curl https://ifconfig.co)
-		else
-			PUBLIC_IP=$(curl -4 https://ifconfig.co)
-		fi
-		ENDPOINT=${ENDPOINT:-$PUBLIC_IP}
 	fi
 
 	# Run setup questions first, and set other variales if auto-install
@@ -663,7 +648,7 @@ function installOpenVPN() {
 		echo "proto ${PROTOCOL}6" >>/etc/openvpn/server.conf
 	fi
 
-	echo 'dev tun
+	echo "dev tun
 user nobody
 group $NOGROUP
 persist-key
@@ -671,10 +656,10 @@ persist-tun
 keepalive 10 120
 max-clients 1024
 ;compress lz4-v2
-;push "compress lz4-v2"
+;push \"compress lz4-v2\"
 topology subnet
 server 10.8.0.0 255.255.255.0
-ifconfig-pool-persist ipp.txt' >>/etc/openvpn/server.conf
+ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 
 	# DNS resolvers
 	case $DNS in
@@ -945,7 +930,7 @@ verb 3" >>/etc/openvpn/client-template.txt
 	if [[ $COMPRESSION_ENABLED == "y" ]]; then
 		echo "compress $COMPRESSION_ALG" >>/etc/openvpn/client-template.txt
 	fi
-}ca
+}
 
 AUTO_INSTALL=y
 
