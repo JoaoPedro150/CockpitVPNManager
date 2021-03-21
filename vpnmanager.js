@@ -67,7 +67,32 @@ function loadConfig() {
             stream: (output) => {
                 serviceStatus = {};
 
-                  
+                output.split('\n').forEach(status => {
+                    keyValuePair = status.split('=');
+                    serviceStatus[keyValuePair[0]] = keyValuePair[1];
+                });
+
+                spanServiceState.innerHTML = `${serviceStatus.ActiveState} (${serviceStatus.SubState})`;
+                
+                if (serviceStatus.Result.match("success")) 
+                    spanServiceState.style.color = "limegreen";
+                else 
+                    spanServiceState.style.color = "red";
+
+                if (serviceStatus.ActiveState.match("^activ"))  
+                    btnToggleServiceState.innerHTML = "Stop";
+                else 
+                    btnToggleServiceState.innerHTML = "Start";
+                               
+                if (serviceStatus.Result.match("success") && !serviceStatus.ActiveState.match("^activ")) 
+                    spanServiceState.style.color = "red";
+                
+
+                btnToggleServiceState.onclick = () => {
+                    spanServiceState.innerHTML = `${btnToggleServiceState.innerHTML}ing...`;
+                    spanServiceState.style.color = "black";
+                    execute({command: ['systemctl', btnToggleServiceState.innerHTML.toLowerCase(), 'openvpn-server@server'], next:setServiceState});
+                }    
             }
         });
     }    
@@ -336,7 +361,29 @@ function updateKeysTable() {
             iterator = output.matchAll(/^V.+\/CN=(.+)$/gm)
             match = iterator.next();
 
-            
+            while (match.value != undefined) {
+                keysTable.innerHTML = keysTable.innerHTML.replace('</tr>',
+                `</tr>
+                    <tr>
+                    <td>
+                        ${match.value[1]}
+                    </td>
+                    <td>
+                        <button id="btn-export-ovpn-${match.value[1]}">Download .ovpn</button>
+                        <button class="removebtn" id="btn-remove-key-${match.value[1]}">Revoke</button>
+                    </td>
+                </tr>`)
+                match = iterator.next();
+            }   
+
+            iterator = output.matchAll(/^V.+\/CN=(.+)$/gm)
+            match = iterator.next();
+
+            while (match.value != undefined) {
+                document.getElementById(`btn-export-ovpn-${match.value[1]}`).onclick = downloadOvpn;
+                document.getElementById(`btn-remove-key-${match.value[1]}`).onclick = removeClient;
+                match = iterator.next();
+            }   
         }
     });
 }
