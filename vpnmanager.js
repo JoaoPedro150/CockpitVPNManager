@@ -50,6 +50,8 @@ serverConf = "";
 clientTemplate = "";
 serverCertificate = "";
 localIp = "";
+addRules = "";
+removeRules = "";
 
 function drawDashboard(data) {
     hideNextStepScreen();
@@ -90,27 +92,18 @@ function loadConfig() {
 
                 btnToggleServiceState.onclick = () => {
                     spanServiceState.innerHTML = `${btnToggleServiceState.innerHTML}ing...`;
-                    spanServiceState.style.color = "black";
-                    execute({command: ['systemctl', btnToggleServiceState.innerHTML.toLowerCase(), 'openvpn-server@server'], next:setServiceState});
+                    spanServiceState.style.color = "white";
+                    execute({
+                        command: ['systemctl', btnToggleServiceState.innerHTML.toLowerCase(), 'iptables-openvpn']
+                    })
+                    .then(() => execute({
+                        command: ['systemctl', btnToggleServiceState.innerHTML.toLowerCase(), 'openvpn-server@server']
+                    }))
+                    .then(setServiceState);
                 }    
             }
         });
     }    
-
-    function getConfig(input, regex) {
-        input.value = serverConf.match(new RegExp(regex))[1];
-    }
-
-    function getLimitedConfig(input, regex) {
-        let match = serverConf.match(new RegExp(regex));
-    
-        if (match == undefined) {
-            input.value = "null";
-        }
-        else {
-            input.value = match[1];
-        }
-    }
     
     function getDns() {
         inputDns.value = "";
@@ -130,11 +123,10 @@ function loadConfig() {
         stream: (data) => {
             serverConf = data;
             setServiceState();
-            getConfig(inputPort, "port ([0-9]*)");
-            getConfig(inputMaxClients, "max-clients ([0-9]*)");
-            getConfig(selectProtocol,);
-            getLimitedConfig(selectCompression, /^compress (lz4-v2|lz4|lzo)$/m);
-            getLimitedConfig(selectProtocol, /^proto (udp|tcp)$/m);
+            inputPort.value = serverConf.match(/port ([0-9]*)/)[1]; 
+            inputMaxClients.value = serverConf.match(/max-clients ([0-9]*)/)[1]; 
+            selectProtocol.value = serverConf.match(/proto (udp|tcp)/)[1]; 
+            selectCompression.value = serverConf.match(/compress (lz4-v2|lz4|lzo)/)?.[1];
             getDns();
             inputs.forEach(input => {
                 input.disabled = false;
@@ -145,7 +137,6 @@ function loadConfig() {
     execute({
         script: "ip -4 addr | sed -ne 's|^.* inet \\([^/]*\\)/.* scope global.*$|\\1|p' | head -1",
         stream: (data) => {
-            console.log(data);
             localIp = data.replace('\n','');
         }
     });
@@ -161,12 +152,24 @@ function loadConfig() {
             serverCertificate = data
         }
     });
+    execute({
+        command: ["cat", "/etc/iptables/add-openvpn-rules.sh"],
+        stream: (data) => {
+            addRules = data
+        }
+    });
+    execute({
+        command: ["cat", "/etc/iptables/rm-openvpn-rules.sh"],
+        stream: (data) => {
+            removeRules = data
+        }
+    });
 }
 
 
 function restartServer() {
     spanServiceState.innerHTML = "Restarting...";
-    spanServiceState.style.color = "black";
+    spanServiceState.style.color = "white";
     let inputs =  [inputDns, inputMaxClients, inputPort, selectProtocol, selectCompression];
 
     inputs.forEach(input => {
@@ -175,23 +178,44 @@ function restartServer() {
     });
     
     execute({
-        command: ['systemctl', 'restart', 'openvpn-server@server'],
-        next: loadConfig
-    });
+        command: ['systemctl', 'stop', 'iptables-openvpn'] 
+    })
+    .then(() => execute({
+        command: ['systemctl', 'stop', 'openvpn-server@server'] 
+    }))
+    .then(() => execute({
+        command: ['systemctl', 'start', 'iptables-openvpn'] 
+    }))
+    .then(() => execute({
+        command: ['systemctl', 'start', 'openvpn-server@server'] 
+    }))
+    .then(loadConfig);
 }
 
 function updateServer() {
+    spanServiceState.innerHTML = "Restarting...";
+    spanServiceState.style.color = "white";
+    let inputs =  [inputDns, inputMaxClients, inputPort, selectProtocol, selectCompression];
+
+    inputs.forEach(input => {
+        input.disabled = true;
+    });
+    
     btnApplyChanges.disabled = true;
     clientTemplate = clientTemplate.replace(/^proto (udp|tcp)$/m, `proto ${selectProtocol.value}`);
     clientTemplate = clientTemplate.replace(/^remote .+ \d+$/m, `remote ${localIp} ${inputPort.value}`)
 
     serverConf = serverConf.replace(/^proto (udp|tcp)$/m, `proto ${selectProtocol.value}`);
     serverConf = serverConf.replace(/^port [0-9]*$/m, `port ${inputPort.value}`);
-    
     serverConf = serverConf.replace(/^max-clients ([0-9]*)$/m, `max-clients ${inputMaxClients.value}`);
 
+    addRules = addRules.replace(/([0-9]{4,})/g, inputPort.value);
+    addRules = addRules.replace(/(udp|tcp)/g, selectProtocol.value);
+    removeRules = removeRules.replace(/(udp|tcp)/g, selectProtocol.value);
+    removeRules = removeRules.replace(/([0-9]{4,})/g, inputPort.value);
+
     function changeCompress() {
-        let disabled = selectCompression.value === "null";
+        let disabled = selectCompression.value === "undefined";
 
         if (disabled) {
             selectCompression.value = "lz4-v2";
@@ -217,14 +241,37 @@ function updateServer() {
     changeDns();
     changeCompress();
 
-    execute({
-        script: `echo -n '${clientTemplate}' > /etc/openvpn/client-template.txt`,
-        next: restartServer
+    inputs.forEach(input => {
+        input.value = "...";
     });
+    
     execute({
-        script: `echo -n '${serverConf}' > /etc/openvpn/server.conf`,
-        next: restartServer
-    });
+        command: ['systemctl', 'stop', 'iptables-openvpn'] 
+    })
+    .then(() => execute({
+        command: ['systemctl', 'stop', 'openvpn-server@server'] 
+    }))
+    .then(() => execute({
+        script: `echo -n '${clientTemplate}' > /etc/openvpn/client-template.txt`
+    }))
+    .then(() => execute({
+        script: `echo -n '${serverConf}' > /etc/openvpn/server.conf`
+    }))
+    .then(() => execute({
+        script: `echo -n '${addRules}' > /etc/iptables/add-openvpn-rules.sh`
+    }))
+    .then(() => execute({
+        script: `echo -n '${removeRules}' > /etc/iptables/rm-openvpn-rules.sh`
+    }))
+    .then(() => { 
+        execute({
+            command: ['systemctl', 'start', 'iptables-openvpn'] 
+        })
+        .then(() => execute({
+            command: ['systemctl', 'start', 'openvpn-server@server'] 
+        }))
+        .then(loadConfig);
+    });  
 }
 
 function isOpenVpnInstalled() {
@@ -260,15 +307,7 @@ function installOpenVPN() {
         writeOutput(output);
         setTimeout(() => window.scrollBy(0,100000),10);
     })
-    .then(()=>{
-        execute({
-            script: "./etc/iptables/add-openvpn-rules.sh",
-            stream: (data) => {
-                console.log(data);
-            }
-        });
-        drawDashboard();
-    })
+    .then(drawDashboard)
     .catch(writeError);
 }
 
@@ -396,33 +435,33 @@ function downloadOvpn(ev) {
         command: ["cat", `/etc/openvpn/easy-rsa/pki/issued/${client}.crt`],
         stream: (data) => {
             ovpn += "\n<cert>\n" + data.match(/-----BEGIN CERTIFICATE-----.+-----END CERTIFICATE-----/s)[0] + "\n</cert>";
-        },
-        next: () => execute({
-            command: ["cat", `/etc/openvpn/easy-rsa/pki/private/${client}.key`],
-            stream: (data) => {
-                ovpn += "\n<key>\n" + data + "</key>";
-            },  
-            next: () => execute({
-                command: ["cat", `/etc/openvpn/tls-crypt.key`],
-                stream: (data) => {
-                    ovpn += "\n<tls-crypt>\n" + data + "</tls-crypt>";
-                },
-                next: () =>{
-                    var element = document.createElement('a');
-                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(ovpn));
-                    element.setAttribute('target', '_blank');
-                    element.setAttribute('download', `${client}.ovpn`);
-                
-                    element.style.display = 'none';
-                    document.body.appendChild(element);
-                
-                    element.click();
-                
-                    document.body.removeChild(element);
-                }
-            })
-        })
+        }
     })
+    .then(() => execute({
+        command: ["cat", `/etc/openvpn/easy-rsa/pki/private/${client}.key`],
+        stream: (data) => {
+            ovpn += "\n<key>\n" + data + "</key>";
+        }
+    }))
+    .then(() => execute({
+        command: ["cat", `/etc/openvpn/tls-crypt.key`],
+        stream: (data) => {
+            ovpn += "\n<tls-crypt>\n" + data + "</tls-crypt>";
+        }
+    }))
+    .then(() => {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(ovpn));
+        element.setAttribute('target', '_blank');
+        element.setAttribute('download', `${client}.ovpn`);
+    
+        element.style.display = 'none';
+        document.body.appendChild(element);
+    
+        element.click();
+    
+        document.body.removeChild(element);
+    });
 }
 function removeClient(ev) {
     client = ev.srcElement.id.match(/btn-remove-key-(.+)/)[1];
@@ -433,22 +472,35 @@ function removeClient(ev) {
         rm -f /etc/openvpn/crl.pem
         cp /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn/crl.pem
         chmod 644 /etc/openvpn/crl.pem
-        sed -i "/^${client},.*/d" /etc/openvpn/ipp.txt`,
-        next: () => { updateKeysTable(); restartServer(); }
-    });
+        sed -i "/^${client},.*/d" /etc/openvpn/ipp.txt`
+    })
+    .then(() => {{ updateKeysTable(); restartServer(); }});
 }
 
 const inputClientName = document.getElementById('client-name');
+const inputPassword = document.getElementById('client-secret');
 const btnAddClient = document.getElementById('btn-add-key');
 btnAddClient.onclick = () => {
+    let script = `./easyrsa build-client-full "${inputClientName.value}"`;
+
+    if (inputPassword.value != "") {
+        script = script.replace("./easyrsa", `./easyrsa --passout=pass:${inputPassword.value}`);
+    }
+    else {
+        script += " nopass";
+    }
+
+    console.log(script);
+
     execute({
-        script: `./easyrsa build-client-full "${inputClientName.value}" nopass`,
+        script: script,
         directory: '/etc/openvpn/easy-rsa',
-        enableLog: true,
-        next: updateKeysTable
-    });
+        enableLog: true
+    })
+    .then(updateKeysTable);
 
     inputClientName.value = ""; 
+    inputPassword.value = "";
 };
 
 // Utils.js
@@ -509,8 +561,8 @@ function execute(args) {
         console.log(firstArgs);
     }
 
-    func(firstArgs, secondArgs)
+    return func(firstArgs, secondArgs)
         .stream(args.stream)
         .then(args.next)
-        .catch((data) => console.error(data));
+        .catch((data) => { console.error([firstArgs, data]); });
 }   
