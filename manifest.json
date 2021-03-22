@@ -1,6 +1,6 @@
 {
     "version": 0,
-
+    "content-security-policy": "default-src 'none'; img-src * 'self' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *",
     "tools": {
         "vpn": {
             "label": "OpenVPN Manager",

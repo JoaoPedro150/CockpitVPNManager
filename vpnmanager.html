@@ -3,6 +3,7 @@
 <head>
     <title>OpenVPN Manager</title>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
     <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
     <link href="./styles/global.css" type="text/css" rel="stylesheet">
     <script src="../base1/cockpit.js"></script>
@@ -115,29 +116,6 @@
         </main>
     </div>
 
-    <script>
-        const settingsScreen = document.getElementById('settings_screen');
-        const clientsScreen = document.getElementById('clients_screen');
-        const keysScreen = document.getElementById('keys_screen');
-
-        function settingsScreen(){
-            settingsScreen.style.setProperty("display", "flex", "important");
-            clientsScreen.style.setProperty("display", "none", "important");
-            keysScreen.style.setProperty("display", "none", "important");
-        }
-
-        function clientsScreen(){
-            settingsScreen.style.setProperty("display", "none", "important");
-            clientsScreen.style.setProperty("display", "flex", "important");
-            keysScreen.style.setProperty("display", "none", "important");
-        }
-
-        function keysScreen(){
-            settingsScreen.style.setProperty("display", "none", "important");
-            clientsScreen.style.setProperty("display", "none", "important");
-            keysScreen.style.setProperty("display", "flex", "important");
-        }
-    </script>
     <script src="vpnmanager.js"></script>
 </body>
 </html>

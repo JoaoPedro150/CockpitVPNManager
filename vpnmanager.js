@@ -167,6 +167,7 @@ function loadConfig() {
 }
 
 
+
 function restartServer() {
     spanServiceState.innerHTML = "Restarting...";
     spanServiceState.style.color = "white";
@@ -191,6 +192,8 @@ function restartServer() {
     }))
     .then(loadConfig);
 }
+
+
 
 function updateServer() {
     spanServiceState.innerHTML = "Restarting...";
@@ -238,8 +241,19 @@ function updateServer() {
             serverConf += `push "dhcp-option DNS ${dns2}"`;
     }
 
+    function enableManagement() {
+        console.log("AAAAA");
+        if(!(/^;?management localhost 7505$/m.test(serverConf)))
+            serverConf += 'management localhost 7505';
+
+        //serverConf += `push "dhcp-option DNS ${dns2}"`;
+    }
+
+    
     changeDns();
     changeCompress();
+    //enableManagement(); 
+    
 
     inputs.forEach(input => {
         input.value = "...";
@@ -263,7 +277,7 @@ function updateServer() {
     .then(() => execute({
         script: `echo -n '${removeRules}' > /etc/iptables/rm-openvpn-rules.sh`
     }))
-    .then(() => { 
+    .then(() => {
         execute({
             command: ['systemctl', 'start', 'iptables-openvpn'] 
         })
@@ -273,6 +287,7 @@ function updateServer() {
         .then(loadConfig);
     });  
 }
+
 
 function isOpenVpnInstalled() {
     function installOpenVpnMessage(data) {
@@ -434,7 +449,7 @@ function downloadOvpn(ev) {
     execute({
         command: ["cat", `/etc/openvpn/easy-rsa/pki/issued/${client}.crt`],
         stream: (data) => {
-            ovpn += "\n<cert>\n" + data.match(/-----BEGIN CERTIFICATE-----.+-----END CERTIFICATE-----/s)[0] + "\n</cert>";
+            ovpn += "\n<cert>\n" + data.match(new RegExp(/-----BEGIN CERTIFICATE-----(.|\n)+-----END CERTIFICATE-----/g))[0] + "\n</cert>";
         }
     })
     .then(() => execute({
@@ -450,19 +465,47 @@ function downloadOvpn(ev) {
         }
     }))
     .then(() => {
-        var element = document.createElement('a');
+        let firefoxAgent =  navigator.userAgent.indexOf("Firefox") > -1; 
+        if(!firefoxAgent) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(ovpn));
+            element.setAttribute('target', '_blank');
+            element.setAttribute('download', `${client}.ovpn`);
+            element.style.display = 'none';
+
+            document.body.appendChild(element);
+    
+            element.click();
+        
+            document.body.removeChild(element);
+        } else {
+            uriContent = "data:text/plain;charset=utf-8," + encodeURIComponent(ovpn);
+            newWindow = window.open(uriContent, `${client}.ovpn`);
+        }
+
+        /*var element = document.createElement('a');
+        console.log(encodeURIComponent(ovpn));
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(ovpn));
         element.setAttribute('target', '_blank');
         element.setAttribute('download', `${client}.ovpn`);
-    
         element.style.display = 'none';
-        document.body.appendChild(element);
+
+        var event = document.createEvent("MouseEvents");
+        event.initMouseEvent(
+                "click", true, false, window, 0, 0, 0, 0, 0
+                , false, false, false, false, 0, null
+        );
+        element.dispatchEvent(event);
+
+        /*document.body.appendChild(element);
     
         element.click();
     
-        document.body.removeChild(element);
+        document.body.removeChild(element);*/
     });
 }
+
+
 function removeClient(ev) {
     client = ev.srcElement.id.match(/btn-remove-key-(.+)/)[1];
     execute({
