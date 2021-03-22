@@ -7,8 +7,6 @@ License:        MIT
 URL:            https://www.github.com/JoaoPedro150
 Source0:        vpnmanager-1.tar.gz
 
-BuildArch:      noarch
-BuildRoot:      %{_tmppath}/%{name}-buildroot
 %description
 User interface for managing OpenVPN settings, keys and clients.
 
@@ -24,8 +22,11 @@ cp -R styles vpnmanager.html vpnmanager.js installation.sh manifest.json %{build
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,root,-)
-/usr/share/cockpit/vpnmanager/
+/usr/share/cockpit/vpnmanager/styles
+/usr/share/cockpit/vpnmanager/vpnmanager.html 
+/usr/share/cockpit/vpnmanager/vpnmanager.js 
+/usr/share/cockpit/vpnmanager/installation.sh 
+/usr/share/cockpit/vpnmanager/manifest.json 
 
 %changelog
 * Thu Mar 11 2021 Joao Pedro e Hugo
