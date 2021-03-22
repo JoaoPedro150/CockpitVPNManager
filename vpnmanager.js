@@ -522,12 +522,17 @@ function removeClient(ev) {
 
 const inputClientName = document.getElementById('client-name');
 const inputPassword = document.getElementById('client-secret');
+const inputPasswordConfirmation = document.getElementById('client-secret-confirmation');
 const btnAddClient = document.getElementById('btn-add-key');
 btnAddClient.onclick = () => {
     let script = `./easyrsa build-client-full "${inputClientName.value}"`;
 
     if (inputPassword.value != "") {
-        script = script.replace("./easyrsa", `./easyrsa --passout=pass:${inputPassword.value}`);
+        if(inputPassword.value === inputPasswordConfirmation.value)
+            script = script.replace("./easyrsa", `./easyrsa --passout=pass:${inputPassword.value}`);
+        else {
+            alert("passwords don't match"); return;
+        }  
     }
     else {
         script += " nopass";
@@ -544,6 +549,7 @@ btnAddClient.onclick = () => {
 
     inputClientName.value = ""; 
     inputPassword.value = "";
+    inputPasswordConfirmation.value = "";
 };
 
 // Utils.js
