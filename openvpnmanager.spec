@@ -18,9 +18,9 @@ User interface for managing OpenVPN settings, keys and clients.
 
 %install
 mkdir -p %{buildroot}/usr/share/cockpit/vpnmanager/
-cp -R * %{buildroot}/usr/share/cockpit/vpnmanager/
+cp -R styles vpnmanager.html vpnmanager.js installation.sh manifest.json %{buildroot}/usr/share/cockpit/vpnmanager/
 
-%clean
+%clean  
 rm -rf $RPM_BUILD_ROOT
 
 %files
