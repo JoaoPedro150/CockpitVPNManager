@@ -2,7 +2,7 @@
 A OpenVPN manager and installer, add-on for Cockpit CMS.
 
 ## Installing
-Download the latest .rpm release and install.
+Download and install the latest .rpm release.
 ```bash
 wget https://github.com/JoaoPedro150/CockpitVPNManager/releases/latest/download/vpnmanager-1-1.el7.noarch.rpm
 rpm -i vpnmanager-1-1.el7.noarch.rpm
